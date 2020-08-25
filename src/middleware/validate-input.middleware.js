@@ -1,6 +1,7 @@
 export default (schema, slice) => {
   return async (req, res, next) => {
     try {
+
       await schema.validateAsync(req[slice], {
         abortEarly: false,
         language: {

@@ -1,46 +1,53 @@
 {
-	"name": "prescription-reminder",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"start": "node build/server.js",
-		"start:dev": "NODE_ENV=development nodemon --exec babel-node src/server.js",
-		"build": "rm -rf build && babel src -d build"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/dbytecoderc/prescription-reminder.git"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/dbytecoderc/prescription-reminder/issues"
-	},
-	"homepage": "https://github.com/dbytecoderc/prescription-reminder#readme",
-	"dependencies": {
-		"@babel/polyfill": "^7.10.4",
-		"@hapi/joi": "^17.1.1",
-		"bcryptjs": "^2.4.3",
-		"chalk": "^4.1.0",
-		"dotenv": "^8.2.0",
-		"express": "^4.17.1",
-		"joi": "^17.2.1",
-		"jsonwebtoken": "^8.5.1",
-		"mongoose": "^5.10.0",
-		"uuidv4": "^6.2.3"
-	},
-	"devDependencies": {
-		"@babel/cli": "^7.10.5",
-		"@babel/core": "^7.11.4",
-		"@babel/node": "^7.10.5",
-		"@babel/plugin-transform-regenerator": "^7.10.4",
-		"@babel/plugin-transform-runtime": "^7.11.0",
-		"@babel/preset-env": "^7.11.0",
-		"@babel/register": "^7.10.5",
-		"@babel/runtime": "^7.11.2",
-		"morgan": "^1.10.0",
-		"nodemon": "^2.0.4"
-	}
+  "name": "prescription-reminder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=staging node build/server.js",
+    "start:dev": "NODE_ENV=development nodemon --exec babel-node src/server.js",
+    "build": "rm -rf build && babel src -d build",
+    "prestart:prod": "npm run build && npm run copy:files",
+    "start:prod": "cross-env NODE_ENV=staging node build/server.js",
+    "copy:files": "copyfiles -f './**/templates/*.html' 'build/src/services/templates' && echo 'Template files cloned.' && echo 'Build successful.'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dbytecoderc/prescription-reminder.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dbytecoderc/prescription-reminder/issues"
+  },
+  "homepage": "https://github.com/dbytecoderc/prescription-reminder#readme",
+  "dependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.4",
+    "@babel/polyfill": "^7.10.4",
+    "@hapi/joi": "^17.1.1",
+    "@sendgrid/mail": "^7.2.4",
+    "bcryptjs": "^2.4.3",
+    "chalk": "^4.1.0",
+    "copyfiles": "^2.3.0",
+    "cross-env": "^7.0.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "joi": "^17.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.0",
+    "node-cron": "^2.0.3",
+    "uuidv4": "^6.2.3"
+  },
+  "devDependencies": {
+    "@babel/node": "^7.10.5",
+    "@babel/plugin-transform-regenerator": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/register": "^7.10.5",
+    "@babel/runtime": "^7.11.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.4"
+  }
 }

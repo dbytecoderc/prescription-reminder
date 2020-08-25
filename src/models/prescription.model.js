@@ -13,6 +13,10 @@ const PrscriptionSchema = new Schema({
     type: String,
     required: true,
   },
+  taken: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

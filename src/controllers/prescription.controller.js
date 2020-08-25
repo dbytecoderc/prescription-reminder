@@ -1,19 +1,15 @@
-import crypto from 'crypto';
-import slug from 'slug';
-
 import Prescription from '../models/prescription.model';
-// import User from '../models/user.model';
+
 import {
   successResponse,
   excludeProperty,
-  saveResourceToRedis,
   errorResponse,
 } from '../utils/helpers.utils';
-// import client from '../db/redis.db';
+
 
 
 /**
- * Create A Fixture
+ * Create A Prescription
  * @param {object} req
  * @param {object} res
  * @returns {object} prescription object
@@ -34,106 +30,100 @@ export async function createPrescription(req, res) {
 
   const newPrescription = await prescription.save();
 
-  const prescriptionData = excludeProperty(newPrescription, ['__v']);
-
   return successResponse(
     res,
     201,
     'Fixture created',
-    prescriptionData,
+    newPrescription,
   );
 }
 
-// /**
-//  * Update A Fixture
-//  * @param {object} req
-//  * @param {object} res
-//  * @returns {object} fixture object
-//  */
-// export async function updateFixture(req, res) {
-//   const { fixtureId } = req.params;
-//   const { time, home, away, location } = req.body;
-//   const user = excludeProperty(req.user, ['password', '__v']);
+/**
+ * Update A Prescription
+ * @param {object} req
+ * @param {object} res
+ * @returns {object} prescription object
+ */
+export async function updatePrescription(req, res) {
+  const {
+    prescriptionId
+  } = req.params;
 
-//   const homeTeam = await Team.findOne({ name: home });
-//   const awayTeam = await Team.findOne({ name: away });
+  const user = excludeProperty(req.user, ['password', '__v']);
 
-//   if (!homeTeam || !awayTeam) {
-//     return errorResponse(
-//       res,
-//       400,
-//       'One or both of the teams does not exist',
-//       null,
-//     );
-//   }
+  const prescription = await Prescription.findOne({
+    _id: prescriptionId
+  });
 
-//   const fixture = await Fixture.findOne({ _id: fixtureId });
+  if (!prescription) {
+    return errorResponse(res, 404, 'Prescription not found', null);
+  }
 
-//   if (!fixture) {
-//     return errorResponse(res, 404, 'This fixture does not exist', null);
-//   }
+  if (prescription.createdBy._id.toString() != user._id.toString()) {
+    return errorResponse(
+      res,
+      404,
+      'You can not update a prescription you did not create',
+      null,
+    );
+  }
 
-//   if (fixture.createdBy._id.toString() != user._id.toString()) {
-//     return errorResponse(
-//       res,
-//       404,
-//       'You can not update a fixture you did not create',
-//       null,
-//     );
-//   }
+  const updatedPrescription = await Prescription.findByIdAndUpdate({
+    _id: prescription._id
+  }, {
+    ...req.body
+  }, {
+    new: true
+  }, );
 
-//   const updatedFixture = await Fixture.findByIdAndUpdate(
-//     { _id: fixture._id },
-//     { time, homeTeam, awayTeam, location },
-//     { new: true },
-//   );
+  return successResponse(
+    res,
+    200,
+    'Prescription updated',
+    updatedPrescription,
+  );
+}
 
-//   const updatedFixtureData = excludeProperty(updatedFixture, ['__v']);
-//   const allFixtures = await Fixture.find({}, { __v: 0 });
-//   await saveResourceToRedis('fixtures', allFixtures);
 
-//   return successResponse(
-//     res,
-//     200,
-//     responseDataOrigin.db,
-//     'Fixture updated',
-//     updatedFixtureData,
-//   );
-// }
+/**
+ * Delete A Prescription
+ * @param {object} req
+ * @param {object} res
+ * @returns {object} response object
+ */
+export async function deletePrescription(req, res) {
+  const {
+    prescriptionId
+  } = req.params;
 
-// /**
-//  * Delete A Fixture
-//  * @param {object} req
-//  * @param {object} res
-//  * @returns {object} response object
-//  */
-// export async function deleteFixture(req, res) {
-//   const { fixtureId } = req.params;
-//   const user = excludeProperty(req.user, ['password', '__v']);
-//   const fixture = await Fixture.findOne({ _id: fixtureId });
+  const user = excludeProperty(req.user, ['password', '__v']);
 
-//   if (!fixture) {
-//     return errorResponse(res, 404, 'This fixture does not exist', null);
-//   }
+  const prescription = await Prescription.findOne({
+    _id: prescriptionId
+  });
 
-//   if (fixture.createdBy._id.toString() != user._id.toString()) {
-//     return errorResponse(
-//       res,
-//       404,
-//       'You can not delete a team you did not create',
-//       null,
-//     );
-//   }
+  if (!prescription) {
+    return errorResponse(res, 404, 'This prescription does not exist', null);
+  }
 
-//   await Fixture.findByIdAndDelete({ _id: fixture._id });
-//   const allFixtures = await Fixture.find({}, { __v: 0 });
-//   await saveResourceToRedis('fixtures', allFixtures);
+  if (prescription.createdBy._id.toString() != user._id.toString()) {
+    return errorResponse(
+      res,
+      404,
+      'You can not delete a prescription you did not create',
+      null,
+    );
+  }
 
-//   return successResponse(
-//     res,
-//     200,
-//     responseDataOrigin.server,
-//     'Fixture has been deleted',
-//     null,
-//   );
-// }
+  await Prescription.findByIdAndDelete({
+    _id: prescription._id
+  });
+
+
+  return successResponse(
+    res,
+    200,
+    'Prescription has been deleted',
+    null,
+  );
+}
